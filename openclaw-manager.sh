@@ -18,6 +18,10 @@ BOLD='\033[1m'
 DIM='\033[2m'
 NC='\033[0m'
 
+# --------------- oc 快捷命令常量 ---------------
+INSTALL_DIR="$HOME/.openclaw"
+INSTALL_SCRIPT="$INSTALL_DIR/openclaw-manager.sh"
+
 # --------------- 工具函数 ---------------
 print_banner() {
     clear
@@ -31,7 +35,10 @@ print_banner() {
        |_|
 EOF
     echo -e "${NC}"
-    echo -e "${DIM}  一键管理脚本 v1.0 — 安装 · 配置 · 维护 · 更新${NC}"
+    echo -e "${DIM}  一键管理脚本 v1.1 — 安装 · 配置 · 维护 · 更新${NC}"
+    if is_oc_installed 2>/dev/null; then
+        echo -e "${DIM}  快捷命令: ${NC}${GREEN}${BOLD}oc${NC}${DIM} ← 下次直接输入即可打开${NC}"
+    fi
     echo -e "${DIM}  ─────────────────────────────────────────────${NC}"
     echo ""
 }
@@ -51,6 +58,98 @@ confirm() {
     local prompt="${1:-确认操作}"
     read -rp "  ${prompt} [y/N]: " ans
     [[ "$ans" =~ ^[Yy]$ ]]
+}
+
+# --------------- oc 快捷命令管理 ---------------
+is_oc_installed() {
+    [[ -f "$INSTALL_SCRIPT" ]] || return 1
+    for rc_file in "$HOME/.bashrc" "$HOME/.zshrc"; do
+        [[ -f "$rc_file" ]] && grep -q "# OpenClaw Manager shortcut" "$rc_file" 2>/dev/null && return 0
+    done
+    return 1
+}
+
+install_oc_shortcut() {
+    if [[ -z "${BASH_SOURCE[0]:-}" ]] || [[ ! -f "${BASH_SOURCE[0]}" ]]; then
+        warn "无法从管道运行中安装快捷命令，请下载脚本后运行"
+        return 1
+    fi
+
+    local script_path
+    script_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+
+    mkdir -p "$INSTALL_DIR"
+    if [[ "$script_path" != "$INSTALL_SCRIPT" ]]; then
+        cp "$script_path" "$INSTALL_SCRIPT"
+        chmod +x "$INSTALL_SCRIPT"
+    fi
+
+    local alias_line="alias oc='bash \"$INSTALL_SCRIPT\"'"
+    local marker="# OpenClaw Manager shortcut"
+    local updated=false
+
+    for rc_file in "$HOME/.bashrc" "$HOME/.zshrc"; do
+        if [[ -f "$rc_file" ]] && ! grep -q "$marker" "$rc_file" 2>/dev/null; then
+            printf '\n%s\n%s\n' "$marker" "$alias_line" >> "$rc_file"
+            updated=true
+        fi
+    done
+
+    if ! $updated && ! is_oc_installed; then
+        local target_rc="$HOME/.bashrc"
+        case "$(basename "${SHELL:-bash}" 2>/dev/null)" in
+            zsh) target_rc="$HOME/.zshrc" ;;
+        esac
+        printf '\n%s\n%s\n' "$marker" "$alias_line" >> "$target_rc"
+    fi
+
+    return 0
+}
+
+remove_oc_shortcut() {
+    local marker="# OpenClaw Manager shortcut"
+    for rc_file in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.bash_profile"; do
+        if [[ -f "$rc_file" ]] && grep -q "$marker" "$rc_file" 2>/dev/null; then
+            local tmp="${rc_file}.tmp.$$"
+            grep -v -e "$marker" -e "alias oc=.*openclaw-manager" "$rc_file" > "$tmp" || true
+            mv "$tmp" "$rc_file"
+        fi
+    done
+    rm -rf "$INSTALL_DIR"
+}
+
+setup_oc_shortcut() {
+    if [[ -z "${BASH_SOURCE[0]:-}" ]] || [[ ! -f "${BASH_SOURCE[0]}" ]]; then
+        return 0
+    fi
+
+    local script_path
+    script_path="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")"
+
+    if is_oc_installed; then
+        mkdir -p "$INSTALL_DIR"
+        if [[ "$script_path" != "$INSTALL_SCRIPT" ]]; then
+            cp "$script_path" "$INSTALL_SCRIPT"
+            chmod +x "$INSTALL_SCRIPT"
+        fi
+        return 0
+    fi
+
+    echo ""
+    info "检测到首次运行，是否安装 ${BOLD}oc${NC} 快捷命令？"
+    info "安装后只需输入 ${CYAN}oc${NC} 即可在终端任意位置打开本管理面板"
+    echo ""
+    if ! confirm "安装 oc 快捷命令?"; then
+        return 0
+    fi
+
+    install_oc_shortcut || return 0
+
+    echo ""
+    success "oc 快捷命令已安装！"
+    info "请执行 ${CYAN}source ~/.bashrc${NC} 或打开新终端后生效"
+    info "之后只需输入 ${BOLD}${GREEN}oc${NC} 即可打开管理面板"
+    press_enter
 }
 
 # --------------- 环境检测 ---------------
@@ -1156,6 +1255,10 @@ menu_update_uninstall() {
             if confirm "最终确认: 彻底卸载?"; then
                 openclaw uninstall --all --yes
                 npm uninstall -g openclaw 2>/dev/null || true
+                if is_oc_installed; then
+                    remove_oc_shortcut
+                    success "oc 快捷命令已移除"
+                fi
                 success "OpenClaw 已彻底卸载"
             fi
             press_enter
@@ -1178,10 +1281,11 @@ menu_quick() {
         echo -e "  ${BOLD}4)${NC}  打开浏览器仪表盘"
         echo -e "  ${BOLD}5)${NC}  搜索文档"
         echo -e "  ${BOLD}6)${NC}  查看 OpenClaw 版本"
+        echo -e "  ${BOLD}7)${NC}  安装/重装 oc 快捷命令"
         echo ""
         echo -e "  ${DIM}0)  返回主菜单${NC}"
         echo ""
-        read -rp "  请选择 [0-6]: " choice
+        read -rp "  请选择 [0-7]: " choice
 
         case $choice in
         1)
@@ -1214,6 +1318,24 @@ menu_quick() {
             ;;
         6)
             openclaw --version
+            press_enter
+            ;;
+        7)
+            print_banner
+            header "安装 oc 快捷命令"
+            if is_oc_installed; then
+                success "oc 快捷命令已安装"
+                info "脚本路径: $INSTALL_SCRIPT"
+                echo ""
+                if confirm "重新安装 (覆盖更新)?"; then
+                    install_oc_shortcut && success "oc 快捷命令已更新"
+                fi
+            else
+                if install_oc_shortcut; then
+                    success "oc 快捷命令已安装！"
+                    info "请执行 ${CYAN}source ~/.bashrc${NC} 或打开新终端后生效"
+                fi
+            fi
             press_enter
             ;;
         0) return ;;
@@ -1282,4 +1404,5 @@ main_menu() {
 detect_os
 detect_china
 check_node 2>/dev/null || true
+setup_oc_shortcut
 main_menu

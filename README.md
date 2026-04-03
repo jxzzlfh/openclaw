@@ -60,7 +60,8 @@
 └── 0. ⚡ 快捷操作
     ├── 一键状态总览 / 一键诊断
     ├── TUI 终端界面 / 浏览器仪表盘
-    └── 文档搜索 / 版本查看
+    ├── 文档搜索 / 版本查看
+    └── 安装/重装 oc 快捷命令
 ```
 
 ## 特色
@@ -71,6 +72,7 @@
 - **层级菜单导航**：每级子菜单均可返回上级，主菜单可退出
 - **彩色终端输出**：ASCII Banner + 状态指示器 + 彩色提示，清晰友好
 - **安全操作确认**：删除、重置、卸载等危险操作均需二次确认
+- **`oc` 快捷命令**：首次运行自动安装，之后终端输入 `oc` 两个字母即可打开管理面板
 
 ## 系统要求
 
@@ -132,6 +134,18 @@ wsl bash -c "curl -fsSL https://raw.githubusercontent.com/jxzzlfh/openclaw/main/
 wsl bash -c "curl -fsSL https://cang.zixi.run/openclaw-manager.sh | tr -d '\r' > openclaw-manager.sh && chmod +x openclaw-manager.sh && ./openclaw-manager.sh"
 ```
 
+### 使用 `oc` 快捷命令
+
+首次运行脚本时，会提示是否安装 `oc` 快捷命令。确认安装后，打开新终端或执行 `source ~/.bashrc`，之后只需输入：
+
+```bash
+oc
+```
+
+即可从任意目录直接打开管理面板，无需记住脚本路径。
+
+> 如果首次运行时跳过了安装，可在主菜单 `0` 快捷操作 → `7` 安装/重装 oc 快捷命令 中手动安装。
+
 ## 使用示例
 
 ### 新手首次安装（推荐流程）
@@ -163,6 +177,7 @@ wsl bash -c "curl -fsSL https://cang.zixi.run/openclaw-manager.sh | tr -d '\r' >
 | 设置默认模型 | `7 → 4` |
 | 更新 OpenClaw | `9 → 1` |
 | 完全卸载 | `9 → 8` |
+| 安装 oc 快捷命令 | `0 → 7` |
 
 ## 相关文档
 
