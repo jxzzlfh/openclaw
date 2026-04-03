@@ -6,6 +6,8 @@
 ![Platform](https://img.shields.io/badge/Platform-macOS%20%7C%20Linux%20%7C%20WSL2-blue)
 ![License](https://img.shields.io/badge/License-MIT-yellow)
 
+<img width="527" height="553" alt="image" src="https://github.com/user-attachments/assets/3fa2d4ec-bb48-4401-8a89-7178e0904fc0" />
+
 ## 功能概览
 
 ```
