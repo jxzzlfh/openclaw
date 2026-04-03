@@ -85,9 +85,26 @@
 
 ### 一行命令运行
 
+> 国内服务器 / 本地电脑如果拉取 GitHub 困难，请使用下方 **国内加速** 命令。
+
+<table>
+<tr><td><b>🌏 国际线路</b>（GitHub 源）</td></tr>
+<tr><td>
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/jxzzlfh/openclaw/main/openclaw-manager.sh -o openclaw-manager.sh && chmod +x openclaw-manager.sh && ./openclaw-manager.sh
 ```
+
+</td></tr>
+<tr><td><b>🇨🇳 国内加速</b>（国内服务器源）</td></tr>
+<tr><td>
+
+```bash
+curl -fsSL https://cang.zixi.run/openclaw-manager.sh -o openclaw-manager.sh && chmod +x openclaw-manager.sh && ./openclaw-manager.sh
+```
+
+</td></tr>
+</table>
 
 ### 手动下载运行
 
@@ -106,8 +123,11 @@ chmod +x openclaw-manager.sh
 ### WSL2 用户
 
 ```powershell
-# 在 PowerShell 中
-wsl bash -c "curl -fsSL https://raw.githubusercontent.com/jxzzlfh/openclaw/main/openclaw-manager.sh | bash"
+# 国际线路
+wsl bash -c "curl -fsSL https://raw.githubusercontent.com/jxzzlfh/openclaw/main/openclaw-manager.sh -o openclaw-manager.sh && chmod +x openclaw-manager.sh && ./openclaw-manager.sh"
+
+# 国内加速
+wsl bash -c "curl -fsSL https://cang.zixi.run/openclaw-manager.sh -o openclaw-manager.sh && chmod +x openclaw-manager.sh && ./openclaw-manager.sh"
 ```
 
 ## 使用示例
