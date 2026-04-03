@@ -100,7 +100,7 @@ curl -fsSL https://raw.githubusercontent.com/jxzzlfh/openclaw/main/openclaw-mana
 <tr><td>
 
 ```bash
-curl -fsSL https://cang.zixi.run/openclaw-manager.sh -o openclaw-manager.sh && chmod +x openclaw-manager.sh && ./openclaw-manager.sh
+curl -fsSL https://cang.zixi.run/openclaw-manager.sh | tr -d '\r' > openclaw-manager.sh && chmod +x openclaw-manager.sh && ./openclaw-manager.sh
 ```
 
 </td></tr>
@@ -127,7 +127,7 @@ chmod +x openclaw-manager.sh
 wsl bash -c "curl -fsSL https://raw.githubusercontent.com/jxzzlfh/openclaw/main/openclaw-manager.sh -o openclaw-manager.sh && chmod +x openclaw-manager.sh && ./openclaw-manager.sh"
 
 # 国内加速
-wsl bash -c "curl -fsSL https://cang.zixi.run/openclaw-manager.sh -o openclaw-manager.sh && chmod +x openclaw-manager.sh && ./openclaw-manager.sh"
+wsl bash -c "curl -fsSL https://cang.zixi.run/openclaw-manager.sh | tr -d '\r' > openclaw-manager.sh && chmod +x openclaw-manager.sh && ./openclaw-manager.sh"
 ```
 
 ## 使用示例
